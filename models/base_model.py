@@ -16,23 +16,26 @@ class BaseModel:
             **kwargs: Key/value pairs of attributes.
         """
         timestamp_format = "%Y-%m-%dT%H:%M:%S.%f"
+
+        # Initialize id, created_at, and updated_at attributes
         self.id = str(uuid4())
-        self.created_at = datetime.today()
-        self.updated_at = datetime.today()
+        self.created_at = datetime.now()
+        self.updated_at = datetime.now()
+
+        # Populate attributes from kwargs, if provided
         if kwargs:
             for key, value in kwargs.items():
-                if key == "created_at" or key == "updated_at":
-                    self.__dict__[key] = datetime.strptime(
-                            value, timestamp_format)
+                if key in ["created_at", "updated_at"]:
+                    setattr(self, key, datetime.strptime(value, timestamp_format))
                 else:
-                    self.__dict__[key] = value
+                    setattr(self, key, value)
         else:
             models.storage.new(self)
 
     def save(self):
         """Updates the 'updated_at' attribute with
-        the current datetime and save the model."""
-        self.updated_at = datetime.today()
+        the current datetime and saves the model."""
+        self.updated_at = datetime.now()
         models.storage.save()
 
     def to_dict(self):
@@ -41,13 +44,16 @@ class BaseModel:
         Includes the key/value pair '__class__' representing
         the class name of the object.
         """
-        result = self.__dict__.copy()
-        result["created_at"] = self.created_at.isoformat()
-        result["updated_at"] = self.updated_at.isoformat()
-        result["__class__"] = self.__class__.__name__
+        result = {
+            **self.__dict__,
+            "created_at": self.created_at.strftime("%Y-%m-%dT%H:%M:%S.%f"),
+            "updated_at": self.updated_at.strftime("%Y-%m-%dT%H:%M:%S.%f"),
+            "__class__": self.__class__.__name__
+        }
         return result
 
     def __str__(self):
         """Return the string representation of the BaseModel instance."""
-        class_name = self.__class__.__name__
-        return "[{}] ({}) {}".format(class_name, self.id, self.__dict__)
+        return "[{}] ({}) {}".format(
+            self.__class__.__name__, self.id, self.to_dict()
+        )
