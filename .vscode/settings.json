@@ -3,5 +3,9 @@
     "[django-html]": {
         "editor.formatOnSave": false
     },
-    "code-runner.clearPreviousOutput": false
+    "code-runner.clearPreviousOutput": false,
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.autopep8"
+    },
+    "python.formatting.provider": "none"
 }
