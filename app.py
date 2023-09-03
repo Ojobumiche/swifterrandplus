@@ -49,5 +49,11 @@ def logout():
     return redirect(url_for('landing_page'))
 
 
+@app.route("/agent_dashboard", strict_slashes=False)
+def agent_dashboard():
+    """Return the agent to dashboard."""
+    return render_template('agent_dashboard.html')
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
