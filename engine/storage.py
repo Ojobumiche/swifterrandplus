@@ -1,11 +1,15 @@
 #!/usr/bin/python3
 ''' Defines the file storage class '''
 
+from os import getenv
+from sqlachemy.orm import sessionmaker, scoped_session
+from sqlalchemy.ext.declarative import declartive_base
 import json
-from models.base_model import BaseModel
+from models.base_model import Base
 from base_model import Users
+from base_model import Agent
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import (create_engine)
 
 """Create Flask application instance and 
 store it in the app variable
