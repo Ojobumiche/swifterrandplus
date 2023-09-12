@@ -1,70 +1,32 @@
 #!/usr/bin/python3
-''' Defines the file storage class '''
+"""Import SQLALCHEMY library"""
+import os
+from sqlalchemy import Column, Integer, String, create_engine, DateTime
+from sqlalchemy.orm import declarative_base, sessionmaker
+from datetime import datetime
 
-from os import getenv
-from sqlachemy.orm import sessionmaker, scoped_session
-from sqlalchemy.ext.declarative import declartive_base
-import json
-from models.base_model import Base
-from base_model import Users
-from base_model import Agent
-from flask import Flask
-from sqlalchemy import (create_engine)
+# Create the SQLite database engine
+engine = create_engine("sqlite:///user.db")
 
-"""Create Flask application instance and 
-store it in the app variable
-"""
-app = Flask(__name__)
-"""mysql databaseURL"""
-"""MySQL database URL"""
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://username:password@localhost/swifterrandplus'
+# Create a base class for declarative models
+Base = declarative_base()
 
-db = SQLAlchemy['SQLAlchemy_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-"""Create User Data Model.
-User model represent the user_data table"""
+# Define the User model
 
 
-class UserData(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.column(db.String(100), nullable=False)
-    phone_num = db.Column(db.String(20))
-    created_at = db.column(db.DateTime, default=db.func.now())
-    tasks = db.relationship('Task', backref='user', lazy=True)
+class User(Base):
+    __tablename__ = 'users'
+
+    user_id = Column(Integer, primary_key=True, autoincrement=True)
+    username = Column(String(255), nullable=False)
+    email = Column(String(255), nullable=False)
+    password = Column(String(25), nullable=False)  # Fixed typo here
+    phone_number = Column(Integer, nullable=False)  # Fixed typo here
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    def __str__(self):
+        return f"user_id: {self.user_id}, username: {self.username}, email: {self.email}, password: {self.password}, phone_number: {self.phone_number}, created_at: {self.created_at}"
 
 
-class Agent(db.Model):
-    agent_id = db.column(db.Integer, primary_key=True)
-    name = db.column(db.String(100), nullable=False)
-    email = db.column(db.String(100), unique=True, nullable=False)
-    phone_number = db.column(db.String(20))
-    availability = db.column(db.Boolean, default=True)
-    created_at = db.Column(db.DataTime, default=db.func.now())
-
-    """one-to-many relationship with task"""
-    tasks = db.relationship('Task', backref='agent', lazy=True)
-
-    """Define the Task model to establish the relationships"""
-
-
-class Task(db.Model):
-    task_id = db.Column(db.Integer, Primary_key=True)
-    title = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.Text)
-    # you can define other status options
-    status = db.Column(db.String(20), default='Pending')
-    created_at = db.Column(db.DateTime, default=db.func.now())
-
-    """Foreign keys to connect User and Agent"""
-    user_id = db.Column(db.Integer, db.ForeignKey
-                        ('user.user_id'), nullable=False)
-
-    agent_id = db.Column(db.Integer, db.ForeignKey
-                         ('agent.agent_id'))
-
-    """Create the database table"""
-    with app.app_context():
-        db.create_all()
+# Create the table in the database
+Base.metadata.create_all(engine)
